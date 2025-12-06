@@ -1,32 +1,66 @@
 import pymupdf
-from utils.text import limpartexto
+import utils.text as text
+import os
 
-def carregardocumento(arquivo):
-    documento = pymupdf.open(arquivo)
-    return documento
+class Extractor:
+    def __init__(self, arquivo):
+        self.pdf = arquivo
 
-def extrairtexto(documento):
-    texto_total = []
+    @staticmethod
+    def carregardocumento(arquivo):
+        try:
+            documento = pymupdf.open(arquivo)
+        except Exception as e:
+            print(f"Erro ao abrir o PDF: {e}")
+            return None
+        return documento
 
-    for pagina in documento:
-        texto_total.append(pagina.get_text())
+    @staticmethod
+    def extrairtexto(documento):
+        texto = ""
+        for i, pagina in enumerate(documento):
+            try:
+                texto += pagina.get_text()
+            except Exception as e:
+                print(f"Não foi possível ler a página {i}: {e}")
+                continue
+        return texto
 
-    return "\n".join(texto_total)
+    @staticmethod
+    def contarpaginas(documento):
+        paginas = documento.page_count
+        return paginas
 
-def contarpaginas(documento):
-    paginas = documento.page_count
-    print("Total de paginas: ", paginas)
+    @staticmethod
+    def contarpalavras(texto: str):
+        if not texto.strip():
+            print(0)
+        return len(texto.split())
 
-def contarpalavras(texto: str) -> int:
-    if not texto.strip():
-        return 0
-    print("Total de Palavras: ", len(texto.split()))
+    @staticmethod
+    def organizar(npg, npa, vu, vd, p):
+        dicionario = {
+            'Numero de Paginas': npg,
+            'Numero de Palavras': npa,
+            'Palavras Unicas no Texto': vu,
+            '10 Palavras Mais Frequentes no Texto': vd,
+            'Peso do Documento (em bytes)': p,
+        }
+        return dicionario
 
-def saida(arquivo):
-    documento = carregardocumento(arquivo)
-    texto = extrairtexto(documento)
-    contarpaginas(documento)
-    textolimpo = limpartexto(texto)
-    contarpalavras(textolimpo)
-    documento.close()
+    def saida(self):
+        documento = self.carregardocumento(self.pdf)
+        texto = self.extrairtexto(documento)
+        numpaginas = self.contarpaginas(documento)
+        aux = text.Text(texto)
+        textolimpo = aux.limpartexto()
+        numpalavras = self.contarpalavras(textolimpo)
+        textosemstop = aux.removerstopwords(textolimpo)
+        vocabulariou = aux.vocabulariounico(textosemstop)
+        vocabulario10 = aux.maisfrequentes(textosemstop)
+        peso = os.path.getsize(self.pdf)
+        dadosfinais = self.organizar(numpaginas, numpalavras, vocabulariou, vocabulario10, peso)
+        print(dadosfinais)
+        documento.close()
+
 

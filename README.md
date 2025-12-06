@@ -15,7 +15,7 @@ Os assuntos abordados nesse arquivo tratam de:
 ## Ferramentas Utilizadas
 - Python 3.13
 - Ambiente de Desenvolvimento Integrado PyCharm
-- Bibliotecas Python argparse, pymupdf, re, unicodedata e string
+- Bibliotecas Python argparse, pymupdf, re, unicodedata, string, os, nltk
 
 ## Construção do Trabalho
 Primeiramente foi criado o repositório, seguindo a base de arquivos enviada no enunciado do trabalho. Após isso foi criado as estuturas do arquivo main e arguments. É notável que a linguagem Python não precisa de funções como a linguagem Java precisa, por exemplo, mas essa modularização garante a segurança e integração dos códigos.
@@ -34,3 +34,25 @@ Como já citado, a função de contarpaginas precisa do arquivo text.py, que con
 - Como os acentos não são caracteres ASCII, todos os acentos são removidos;
 - Toda a pontuação foi removida;
 - E qualquer coisa que não seja número, letra ou espaço é removida.
+
+Continuando os trabalhos, o foco da vez agora era ajeitar a estrutura do código e terminar a parte analítica. Após pensar um pouco, notei que ainda faltava uma coisa para que a estrutura ficasse ótima: as classes. Para projetos envolvendo várias pastas e arquivos, ter classes em cada código facilita a sua chamada e implementação.
+
+Após corrigir a estrutura dos arquivos já feitos, foi transformado em função estática todas as funções que podiam ser estáticas, para facilitar sua implementação.
+
+Após isso foram feitas as funções para retirar stopwords utilizando a biblioteca nltk (permitida apenas para essa tarefa) e o resultado do tratamento vai para as funções que auxiliam a contar quantas palavras únicas tem e as 10 palavras mais frequentes do texto. Por fim, foi utilizado a biblioteca os para analisar o tamanho do arquivo em bytes. Os resultados foram reunidos em um dicionário e este dicionário é exposto ao usuário.
+
+
+## Resumo dos Commits
+### Commit 1: 
+- Estrutura base das pastas e arquivos;
+- Arquivos main.py, arguments.py, extractor.py e text.py criados;
+- Funções main.py criada;
+- Funções arguments.py: argumentos e principal;
+- Funções extractor.py: carregardocumento, extrairtexto, contarpaginas, contarpalavras e saida criados e desenvolvidos;
+- Funções text.py: limpartexto criado e desenvolvido;
+
+### Commit 2
+- Alteração na estrutura dos códigos; Agora cada código é uma classe;
+- Função main.py: __init__ criada e desenvolvida;
+- Funções extractor.py: carregardocumento e extrairtexto aprimoradas para pdfs grandes. saida aprimorada para receber todas as operações, saida criada e desenvolvida;
+- Funções text.py: removerstopwords, vocabulariounico e maisfrequentes criadas e desenvolvidas.
