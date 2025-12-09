@@ -6,10 +6,9 @@ class Extractor:
     def __init__(self, arquivo):
         self.pdf = arquivo
 
-    @staticmethod
-    def carregardocumento(arquivo):
+    def carregardocumento(self):
         try:
-            documento = pymupdf.open(arquivo)
+            documento = pymupdf.open(self.pdf)
         except Exception as e:
             print(f"Erro ao abrir o PDF: {e}")
             return None
@@ -49,7 +48,7 @@ class Extractor:
         return dicionario
 
     def saida(self):
-        documento = self.carregardocumento(self.pdf)
+        documento = self.carregardocumento()
         texto = self.extrairtexto(documento)
         numpaginas = self.contarpaginas(documento)
         aux = text.Text(texto)
@@ -60,7 +59,14 @@ class Extractor:
         vocabulario10 = aux.maisfrequentes(textosemstop)
         peso = os.path.getsize(self.pdf)
         dadosfinais = self.organizar(numpaginas, numpalavras, vocabulariou, vocabulario10, peso)
-        print(dadosfinais)
         documento.close()
+        return dadosfinais
+
+    def saidallm(self):
+        documento = self.carregardocumento()
+        texto = self.extrairtexto(documento)
+        aux = text.Text(texto)
+        textolimpo = aux.limpartexto()
+        return textolimpo
 
 

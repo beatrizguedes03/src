@@ -41,6 +41,26 @@ Após corrigir a estrutura dos arquivos já feitos, foi transformado em função
 
 Após isso foram feitas as funções para retirar stopwords utilizando a biblioteca nltk (permitida apenas para essa tarefa) e o resultado do tratamento vai para as funções que auxiliam a contar quantas palavras únicas tem e as 10 palavras mais frequentes do texto. Por fim, foi utilizado a biblioteca os para analisar o tamanho do arquivo em bytes. Os resultados foram reunidos em um dicionário e este dicionário é exposto ao usuário.
 
+Partindo para as tarefas mais complexas da CLI, foi criado o arquivo images.py para extração das imagens do documento. Utilizando a função get_images a biblioteca os para salvar todas as imagens extraídas, foi criado com sucesso duas funções (acharimagens, salvarimagens) para o processamento. Entretando, é importante ressaltar que qualquer imagem posta no pdf que não tenha uma extensão de imagem (como em muitos adesivos do canva, por exemplo) não vai ser reconhecida como tal. Para isso, funções de processamento de imagens devem ser feitos (coisa que é bem difícil de fazer com bibliotecas padrão do Python. Não foi pesquisado bibliotecas para manipular pdf além das 3 citada no enunciado no desafio).
+
+Após isso, vem a tarefa mais visada desse desafio: carregar uma llm para fazer o resumo textual do pdf. Para essa tarefa, deve ser notado diversos fatores:
+- O hardware da autora desse relatório não tem GPU.
+- O hardware da autora desse relatório é fraco para modelos multimodais;
+- O Hardware da autora desse relatório não possui AVX.
+
+Dado todos esses impedimentos, a solução para usar um modelo do Hugging Face foi utilizar o programa LM Studio para conseguir gerar um servidor local de uma llm. Foi escolhido a LLM qwen2.5-1.5b-instruct, por ser leve e ter suporte para Portugês-BR. Além disso, para deixar o modelo mais leve ainda, ele foi baaixado na extensão .gguf (formato binário utilizado para armazenar modelos de linguagem grandes (LLMs), É um formato otimizado, especialmente para carregar e salvar modelos rapidamente, tornando a inferência (geração de respostas pelo modelo) mais eficiente, inclusive em CPUs.)
+
+Com estas configurações, foi montado o arquivo model.py com a função para criar o resumo, tudo que você precisa fazer é obter o endereço local passado pelo lm studio quando inicia o server e rodar o arquivo. O prompt é bem claro: "Segue o conteúdo extraído do PDF:\n\n{texto}\n\n" "Resuma isso em um parágrafo, em português do Brasil."
+
+Após fazer as mudanças no arquivo arguments.py, temos mais duas tarefas finalizadas.
+
+A tarefa de criar o arquivo summarize.py me mostrou que parte do desenvolvimento da tarefa estava errado. E é logo a parte mais crucial: o LLM. Ignorei que deveria ser utilizado um LLM local, porém sem nenhum programa externo. Logo, o lm studio não pode ser utilizado.
+
+A solução foi utilizar uma SLM (pequeno modelo de linguagem), sendo escolhido o modelo qwen2.5-1.5b-instruct (puro) para esta tarefa. Sim, o código demora MUITO pra rodar, mas foi a única solução possível.
+
+Além disso, pequenos modelos de linguagem podem alucinar com inputs muito grandes, então o input do pdf foi dividido em chunks de 2000 caracteres. O input agora passa a ser o texto tratado para evitar desperdício de caracteres.
+
+A estrutura de model.py estava fazendo o trabalho de model.py e summarize.py. Para corrigir este erro, as funções carregarmodelo (para carregar a llm) e gerarsaida(para receber a saída dos chunks e da resposta final) ficaram em model.py. Já as funções de gerarresumo (onde tem o prompt que vai gerar o resumo) e salvarresumo (caso o usuario queira salvar o resumo) estão em summarize.py
 
 ## Resumo dos Commits
 ### Commit 1: 
@@ -56,3 +76,8 @@ Após isso foram feitas as funções para retirar stopwords utilizando a bibliot
 - Função main.py: __init__ criada e desenvolvida;
 - Funções extractor.py: carregardocumento e extrairtexto aprimoradas para pdfs grandes. saida aprimorada para receber todas as operações, saida criada e desenvolvida;
 - Funções text.py: removerstopwords, vocabulariounico e maisfrequentes criadas e desenvolvidas.
+
+### Commit 3
+- Alteração na função carregardocumento (extractor.py): o método não é mais estático;
+- Desenvolvimento da função principal (arguments.py): para incluir as funções do arquivo model.py
+- Arquivos images.py e model.py criados e desenvolvidos.
