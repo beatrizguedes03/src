@@ -1,4 +1,4 @@
-import pymupdf
+import logging
 import os
 import pdf.extractor as extractor
 
@@ -33,12 +33,11 @@ class Images:
                     arquivo.write(conteudo)
 
                 caminhos.append(caminhofoto)
-                print(f"Imagem {i} Salva.")
+                logging.info(f"Imagem {i} Salva em {caminhofoto}")
 
             except Exception as e:
-                print(f"Falha ao salvar imagem {i}: {e}")
+                logging.error(f"Falha ao salvar imagem {i}: {e}")
 
-        print("Processo concluído.")
         return caminhos
 
     def principal(self):

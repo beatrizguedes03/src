@@ -1,6 +1,5 @@
 import re
 import unicodedata
-import string
 from collections import Counter
 import nltk
 from nltk.corpus import stopwords
@@ -11,9 +10,10 @@ class Text:
 
     def limpartexto(self):
         self.texto = self.texto.lower()
-        self.texto = unicodedata.normalize("NFD", self.texto)
+        self.texto = self.texto.replace(u'\xa0', ' ')
+        self.texto = unicodedata.normalize('NFKD', self.texto)
         self.texto = self.texto.encode("ascii", "ignore").decode("utf-8")
-        self.texto = self.texto.translate(str.maketrans("", "", string.punctuation))
+        self.texto = self.texto.replace("\n", " ").replace("\t", " ")
         self.texto = re.sub(r"[^a-z0-9 ]+", " ", self.texto)
         self.texto = re.sub(r"\s+", " ", self.texto).strip()
 

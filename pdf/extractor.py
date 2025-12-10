@@ -1,29 +1,39 @@
+import logging
 import pymupdf
 import utils.text as text
 import os
 
 class Extractor:
-    def __init__(self, arquivo):
+    def __init__(self, arquivo: str):
         self.pdf = arquivo
+        self.documento = self.carregardocumento()
 
     def carregardocumento(self):
         try:
-            documento = pymupdf.open(self.pdf)
+            return pymupdf.open(self.pdf)
         except Exception as e:
-            print(f"Erro ao abrir o PDF: {e}")
+            logging.error(f"Erro ao abrir PDF: {e}")
             return None
-        return documento
 
-    @staticmethod
-    def extrairtexto(documento):
-        texto = ""
-        for i, pagina in enumerate(documento):
+    def tamanhopdf(self):
+        paginas = self.documento.page_count
+        bytes_ = os.path.getsize(self.pdf)
+        mb = bytes_ / (1024 ** 2)
+
+        return 1 if mb > 20 or paginas > 50 else 0
+
+    def extrairtexto(self):
+        if self.documento is None:
+            return ""
+
+        texto = []
+        for i in range(self.documento.page_count):
             try:
-                texto += pagina.get_text()
+                texto.append(self.documento[i].get_text())
             except Exception as e:
-                print(f"Não foi possível ler a página {i}: {e}")
-                continue
-        return texto
+                logging.warning(f"Falha ao ler página {i}: {e}")
+
+        return "".join(texto)
 
     @staticmethod
     def contarpaginas(documento):
@@ -48,9 +58,8 @@ class Extractor:
         return dicionario
 
     def saida(self):
-        documento = self.carregardocumento()
-        texto = self.extrairtexto(documento)
-        numpaginas = self.contarpaginas(documento)
+        texto = self.extrairtexto()
+        numpaginas = self.contarpaginas(self.documento)
         aux = text.Text(texto)
         textolimpo = aux.limpartexto()
         numpalavras = self.contarpalavras(textolimpo)
@@ -59,14 +68,20 @@ class Extractor:
         vocabulario10 = aux.maisfrequentes(textosemstop)
         peso = os.path.getsize(self.pdf)
         dadosfinais = self.organizar(numpaginas, numpalavras, vocabulariou, vocabulario10, peso)
-        documento.close()
+        logging.info(dadosfinais)
         return dadosfinais
 
-    def saidallm(self):
-        documento = self.carregardocumento()
-        texto = self.extrairtexto(documento)
+    def textoparallm(self):
+        texto = self.extrairtexto()
         aux = text.Text(texto)
         textolimpo = aux.limpartexto()
         return textolimpo
+
+    def fechardocumento(self):
+        if self.documento is not None:
+            try:
+                self.documento.close()
+            except Exception as e:
+                logging.error(f"Erro ao fechar PDF: {e}")
 
 

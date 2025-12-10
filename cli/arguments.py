@@ -18,11 +18,11 @@ class Arguments:
 
         resumo = subparsers.add_parser('resumo', help='Gera resumo com LLM local')
         resumo.add_argument('arquivo_entrada')
-        resumo.add_argument('-o', '--saida', help='Salvar resumo em arquivo')
+        resumo.add_argument('-o', '--saida', help='Salvar resumo em arquivo .md ou .txt')
 
         relatorio = subparsers.add_parser('relatorio', help='Relatorio completo com todos os Dados Unificados')
         relatorio.add_argument('arquivo_entrada')
-        relatorio.add_argument('-o', '--saidar', help='Salvar relatorio em arquivo')
+        relatorio.add_argument('-o', '--saidar', help='Salvar relatorio em arquivo .md ou .txt')
 
         return parser
 
@@ -30,35 +30,51 @@ class Arguments:
         parser = self.argumentos()
         args = parser.parse_args()
 
+        if not args.arquivo_entrada.endswith(".pdf"):
+            logging.error("Arquivo de Entrada nao Suportado. ")
+            parser.print_help()
+            return
+
+        documento = extractor.Extractor(args.arquivo_entrada)
+        dados = documento.tamanhopdf()
+
+        if dados == 1:
+            logging.error("Tamanho do Arquivo nao Suportado. ")
+            parser.print_help()
+            return
+
         if args.comando == "info":
-            logging.info("Iniciando análise do PDF...")
-            documento = extractor.Extractor(args.arquivo_entrada)
-            analise = documento.saida()
-            print(analise)
+            logging.info("Iniciando analise do PDF...")
+            documento.saida()
+            logging.info("Analise Concluida. ")
 
         elif args.comando == "imagens":
-            print("Extraindo imagens...")
-            documento = images.Images(args.arquivo_entrada)
-            documento.principal()
+            logging.info("Extraindo imagens...")
+            fotos = images.Images(args.arquivo_entrada)
+            fotos.principal()
+            logging.info("Extraçao Concluida. ")
 
         elif args.comando == "resumo":
-            print("Gerando resumo...")
-            extrator = extractor.Extractor(args.arquivo_entrada)
-            texto = extrator.saidallm()
+            logging.info("Gerando resumo...")
+            texto = documento.textoparallm()
             summarizer = summarize.Summarize(texto)
             resumo = summarizer.gerarresumo()
+            logging.info("Resumo Gerado. ")
             if args.saida:
+                logging.info("Salvando Resumo...")
+                if not args.saida.endswith(".txt") and not args.saida.endswith(".md"):
+                    logging.error("Arquivo de Saida nao Suportado. ")
+                    parser.print_help()
+                    return
                 summarizer.salvarresumo(resumo, args.saida)
 
+
         elif args.comando == "relatorio":
-            print("Gerando relatorio...")
-            extrator = extractor.Extractor(args.arquivo_entrada)
-            analise = extrator.saida()
-            texto = extrator.saidallm()
-
-            aux_imagens = images.Images(args.arquivo_entrada)
-            fotos = aux_imagens.principal()
-
+            logging.info("Gerando relatorio...")
+            analise = documento.saida()
+            texto = documento.textoparallm()
+            aux = images.Images(args.arquivo_entrada)
+            fotos = aux.principal()
             summarizer = summarize.Summarize(texto)
             resumo = summarizer.gerarresumo()
 
@@ -67,13 +83,20 @@ class Arguments:
                 'resumo': resumo,
                 'diretorioimagens': fotos
             }
+            logging.info("Relatorio Gerado. ")
 
             if args.saidar:
+                logging.info("Salvando Relatorio...")
+                if not args.saidar.endswith(".txt") and not args.saidar.endswith(".md"):
+                    logging.error("Arquivo de Saida nao Suportado. ")
+                    parser.print_help()
+                    return
                 summarizer.salvarrelatorio(relatoriofinal, args.saidar)
-
-            print("Relatório gerado com sucesso.")
 
 
         else:
+            logging.error("Comando nao Reconhecido. ")
             parser.print_help()
+
+        documento.fechardocumento()
 

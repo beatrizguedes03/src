@@ -62,6 +62,8 @@ Além disso, pequenos modelos de linguagem podem alucinar com inputs muito grand
 
 A estrutura de model.py estava fazendo o trabalho de model.py e summarize.py. Para corrigir este erro, as funções carregarmodelo (para carregar a llm) e gerarsaida(para receber a saída dos chunks e da resposta final) ficaram em model.py. Já as funções de gerarresumo (onde tem o prompt que vai gerar o resumo) e salvarresumo (caso o usuario queira salvar o resumo) estão em summarize.py
 
+Ok. Muita coisa aconteceu. Foram feita diversas reformas no código a fim de melhorar o desempenho e resposta do mesmo. Primeiramente, fiz uma das modificações opcionais (trocar os prints e errors por logging). Segundo que mesmo com muita otimização, o cli ainda estava muito lento para adquirir o resumo e estava alucinando. Para contornar isso, fiz uma função recursiva para 
+
 ## Resumo dos Commits
 ### Commit 1: 
 - Estrutura base das pastas e arquivos;

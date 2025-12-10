@@ -1,3 +1,4 @@
+import logging
 from llm.model import Model
 import os
 
@@ -5,73 +6,62 @@ class Summarize:
     def __init__(self, texto):
         self.texto = texto
 
-    def gerarresumo(self):
+    def mapreducesummarizer(self, texto, model, tokenizer, limite=2000):
         aux = Model()
-        tokenizer, model = aux.carregarmodelo()
 
-        tamanhochunk = 2000
-        chunks = [self.texto[i:i + tamanhochunk] for i in range(0, len(self.texto), tamanhochunk)]
+        if len(texto) <= limite:
+            prompt = (
+                "<|im_start|>system\n"
+                "Você é um assistente especialista em resumos. Resuma o texto abaixo em 1 parágrafo, em Português (PT-BR), sem inventar informações.\n"
+                "<|im_end|>\n"
+                "<|im_start|>user\n"
+                f"{texto}\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant"
+            )
+            return aux.gerarsaida(model, tokenizer, prompt)
 
+        chunks = [texto[i:i + limite] for i in range(0, len(texto), limite)]
         resumos = []
 
         for chunk in chunks:
             prompt = (
-                f"""### Texto:
-                {chunk}
-
-                ### Instrução:
-                Resuma o texto acima.
-
-                ### Regras:
-                1. Use apenas texto, sem hashtags ou símbolos extras.
-                2. Responda em apenas 1 parágrafo.
-                3. Não invente informações.
-                4. Português do Brasil.
-                5. Não comece com saudações.
-
-                ### Resposta:"""
+                "<|im_start|>system\n"
+                "Você é um assistente útil.\n"
+                "<|im_end|>\n"
+                "<|im_start|>user\n"
+                f"Resuma este trecho: {chunk}\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant"
             )
+            resumos.append(aux.gerarsaida(model, tokenizer, prompt))
 
-            resumo = aux.gerarsaida(model, tokenizer, prompt)
-            resumos.append(resumo)
+        texto_reduzido = " ".join(resumos)
+        return self.mapreducesummarizer(texto_reduzido, model, tokenizer, limite)
 
-        texto_final = "\n".join(resumos)
 
-        prompt_final = (
-            f"""### Texto:
-                {texto_final}
+    def gerarresumo(self):
+        aux = Model()
+        tokenizer, model = aux.carregarmodelo()
+        resumo = self.mapreducesummarizer(self.texto, model, tokenizer)
+        logging.info(resumo)
+        return resumo
 
-                ### Instrução:
-                Resuma o texto acima.
-
-                ### Regras:
-                1. Use apenas texto, sem hashtags ou símbolos extras.
-                2. Responda em apenas 1 parágrafo.
-                3. Não invente informações.
-                4. Português do Brasil.
-                5. Não comece com saudações.
-
-                ### Resposta:"""
-        )
-
-        resposta = aux.gerarsaida(model, tokenizer, prompt_final)
-
-        print(resposta)
-        return resposta
-
-    def salvarresumo(self, resumo, nome):
+    @staticmethod
+    def salvarresumo(resumo, nome):
         pasta = "resumos"
         os.makedirs(pasta, exist_ok=True)
         caminho = os.path.join(pasta, nome)  # junta pasta + nome do arquivo
         try:
             with open(caminho, "w", encoding="utf-8") as file:
                 file.write(resumo)
-            print(f"Resumo salvo com sucesso em {caminho}.")
+            logging.info(f"Resumo salvo com sucesso em {caminho}.")
 
         except Exception as e:
-            print(f"Falha ao salvar o resumo: {e}")
+            logging.error(f"Falha ao salvar resumo: {e}")
 
-    def salvarrelatorio(self, relatorio, nome):
+    @staticmethod
+    def salvarrelatorio(relatorio, nome):
         pasta = "relatorios"
         os.makedirs(pasta, exist_ok=True)
         caminho = os.path.join(pasta, nome)
@@ -83,6 +73,6 @@ class Summarize:
                 f.write(relatorio['resumo'] + "\n\n")
                 f.write("## Imagens\n")
                 f.write(str(relatorio['diretorioimagens']))
-            print(f"Relatório salvo em {caminho}")
+            logging.info(f"Relatório salvo em {caminho}")
         except Exception as e:
-            print(f"Falha ao salvar o relatorio: {e}")
+            logging.error(f"Falha ao salvar relatorio: {e}")
