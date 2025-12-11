@@ -35,7 +35,6 @@ class Text:
         contagem = Counter(texto)
         top10 = contagem.most_common(10)
 
-        # só as palavras
         palavras = [palavra for palavra, frequencia in top10]
 
         return palavras
