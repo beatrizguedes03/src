@@ -13,10 +13,10 @@ class Summarize:
         if len(texto) <= limite:
             prompt = (
                 "<|im_start|>system\n"
-                "Você é um assistente especialista em resumos. Resuma o texto abaixo em 1 parágrafo, em Português (PT-BR), sem inventar informações.\n"
+                "Você é um assistente útil.\n"
                 "<|im_end|>\n"
                 "<|im_start|>user\n"
-                f"{texto}\n"
+                f"Resuma este texto em apenas 1 parágrafo curto: {texto}\n"
                 "<|im_end|>\n"
                 "<|im_start|>assistant"
             )
