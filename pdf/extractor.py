@@ -7,6 +7,8 @@ class Extractor:
     def __init__(self, arquivo: str):
         self.pdf = arquivo
         self.documento = self.carregardocumento()
+        self.texto = self.extrairtexto()
+        self.peso = os.path.getsize(self.pdf)
 
     def carregardocumento(self):
         try:
@@ -58,22 +60,28 @@ class Extractor:
         return dicionario
 
     def saida(self):
-        texto = self.extrairtexto()
+        logging.info("Iniciando analise do PDF...")
         numpaginas = self.contarpaginas(self.documento)
-        aux = text.Text(texto)
+        aux = text.Text(self.texto)
         textolimpo = aux.limpartexto()
         numpalavras = self.contarpalavras(textolimpo)
-        textosemstop = aux.removerstopwords(textolimpo)
-        vocabulariou = aux.vocabulariounico(textosemstop)
-        vocabulario10 = aux.maisfrequentes(textosemstop)
-        peso = os.path.getsize(self.pdf)
-        dadosfinais = self.organizar(numpaginas, numpalavras, vocabulariou, vocabulario10, peso)
-        logging.info(dadosfinais)
-        return dadosfinais
+        vocabulariou = aux.vocabulariounico()
+        vocabulario10 = aux.maisfrequentes()
+        dadosfinais = self.organizar(numpaginas, numpalavras, vocabulariou, vocabulario10, self.peso)
+        saidafinal = self.imprimirdicionario(dadosfinais)
+        logging.info(saidafinal)
+        logging.info("Analise Concluida. ")
+        return saidafinal
+
+    @staticmethod
+    def imprimirdicionario(dados):
+        linhas = []
+        for categoria, valor in dados.items():
+            linhas.append(f"{categoria}: {valor}")
+        return "\n".join(linhas)
 
     def textoparallm(self):
-        texto = self.extrairtexto()
-        aux = text.Text(texto)
+        aux = text.Text(self.texto)
         textolimpo = aux.limpartexto()
         return textolimpo
 

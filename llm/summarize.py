@@ -3,8 +3,9 @@ from llm.model import Model
 import os
 
 class Summarize:
-    def __init__(self, texto):
+    def __init__(self, texto, nome):
         self.texto = texto
+        self.nome = nome
 
     def mapreducesummarizer(self, texto, model, tokenizer, limite=2000):
         aux = Model()
@@ -41,17 +42,18 @@ class Summarize:
 
 
     def gerarresumo(self):
+        logging.info("Gerando resumo...")
         aux = Model()
         tokenizer, model = aux.carregarmodelo()
         resumo = self.mapreducesummarizer(self.texto, model, tokenizer)
         logging.info(resumo)
+        logging.info("Resumo Gerado. ")
         return resumo
 
-    @staticmethod
-    def salvarresumo(resumo, nome):
+    def salvarresumo(self, resumo):
         pasta = "resumos"
         os.makedirs(pasta, exist_ok=True)
-        caminho = os.path.join(pasta, nome)  # junta pasta + nome do arquivo
+        caminho = os.path.join(pasta, self.nome)  # junta pasta + nome do arquivo
         try:
             with open(caminho, "w", encoding="utf-8") as file:
                 file.write(resumo)
@@ -60,11 +62,10 @@ class Summarize:
         except Exception as e:
             logging.error(f"Falha ao salvar resumo: {e}")
 
-    @staticmethod
-    def salvarrelatorio(relatorio, nome):
+    def salvarrelatorio(self, relatorio):
         pasta = "relatorios"
         os.makedirs(pasta, exist_ok=True)
-        caminho = os.path.join(pasta, nome)
+        caminho = os.path.join(pasta, self.nome)
         try:
             with open(caminho, "w", encoding="utf-8") as f:
                 f.write("## Estatísticas\n")

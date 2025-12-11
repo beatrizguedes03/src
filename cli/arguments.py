@@ -7,22 +7,23 @@ import logging
 class Arguments:
     @staticmethod
     def argumentos():
-        parser = argparse.ArgumentParser(description='Ferramenta CLI para PDFs')
-        subparsers = parser.add_subparsers(dest='comando')
+        parser = argparse.ArgumentParser(description='Ferramenta CLI para processamento de PDFs')
+
+        subparsers = parser.add_subparsers(dest='comando', required=True)
 
         info = subparsers.add_parser('info', help='Mostra estatísticas do PDF')
-        info.add_argument('arquivo_entrada')
+        info.add_argument('arquivo_entrada', help='Caminho do arquivo PDF')
 
-        imagens = subparsers.add_parser('imagens', help='Extrai imagens')
-        imagens.add_argument('arquivo_entrada')
+        imagens = subparsers.add_parser('imagens', help='Extrai todas as imagens do PDF')
+        imagens.add_argument('arquivo_entrada', help='Caminho do arquivo PDF')
 
-        resumo = subparsers.add_parser('resumo', help='Gera resumo com LLM local')
-        resumo.add_argument('arquivo_entrada')
-        resumo.add_argument('-o', '--saida', help='Salvar resumo em arquivo .md ou .txt')
+        resumo = subparsers.add_parser('resumo', help='Gera um resumo usando LLM local')
+        resumo.add_argument('arquivo_entrada', help='Caminho do arquivo PDF')
+        resumo.add_argument('-o', '--saida', help='Salvar resumo em .md ou .txt')
 
-        relatorio = subparsers.add_parser('relatorio', help='Relatorio completo com todos os Dados Unificados')
-        relatorio.add_argument('arquivo_entrada')
-        relatorio.add_argument('-o', '--saidar', help='Salvar relatorio em arquivo .md ou .txt')
+        relatorio = subparsers.add_parser('relatorio', help='Gera relatório completo (estatísticas + resumo)')
+        relatorio.add_argument('arquivo_entrada', help='Caminho do arquivo PDF')
+        relatorio.add_argument('-o', '--saida', help='Salvar relatório em .md ou .txt')
 
         return parser
 
@@ -44,55 +45,49 @@ class Arguments:
             return
 
         if args.comando == "info":
-            logging.info("Iniciando analise do PDF...")
             documento.saida()
-            logging.info("Analise Concluida. ")
 
         elif args.comando == "imagens":
-            logging.info("Extraindo imagens...")
-            fotos = images.Images(args.arquivo_entrada)
-            fotos.principal()
-            logging.info("Extraçao Concluida. ")
+            aux = documento.carregardocumento()
+            fotos = images.Images(aux, args.arquivo_entrada)
+            temfotos = fotos.principal()
+            if temfotos == "Nao Possui. ":
+                return
 
         elif args.comando == "resumo":
-            logging.info("Gerando resumo...")
             texto = documento.textoparallm()
-            summarizer = summarize.Summarize(texto)
+            summarizer = summarize.Summarize(texto, args.saida)
             resumo = summarizer.gerarresumo()
-            logging.info("Resumo Gerado. ")
             if args.saida:
                 logging.info("Salvando Resumo...")
                 if not args.saida.endswith(".txt") and not args.saida.endswith(".md"):
                     logging.error("Arquivo de Saida nao Suportado. ")
                     parser.print_help()
                     return
-                summarizer.salvarresumo(resumo, args.saida)
-
+                summarizer.salvarresumo(resumo)
 
         elif args.comando == "relatorio":
             logging.info("Gerando relatorio...")
             analise = documento.saida()
             texto = documento.textoparallm()
-            aux = images.Images(args.arquivo_entrada)
+            arquivo = documento.carregardocumento()
+            aux = images.Images(arquivo, args.arquivo_entrada)
             fotos = aux.principal()
-            summarizer = summarize.Summarize(texto)
+            summarizer = summarize.Summarize(texto, args.saida)
             resumo = summarizer.gerarresumo()
-
             relatoriofinal = {
                 'estatisticas': analise,
                 'resumo': resumo,
                 'diretorioimagens': fotos
             }
             logging.info("Relatorio Gerado. ")
-
-            if args.saidar:
+            if args.saida:
                 logging.info("Salvando Relatorio...")
-                if not args.saidar.endswith(".txt") and not args.saidar.endswith(".md"):
+                if not args.saida.endswith(".txt") and not args.saida.endswith(".md"):
                     logging.error("Arquivo de Saida nao Suportado. ")
                     parser.print_help()
                     return
-                summarizer.salvarrelatorio(relatoriofinal, args.saidar)
-
+                summarizer.salvarrelatorio(relatoriofinal)
 
         else:
             logging.error("Comando nao Reconhecido. ")

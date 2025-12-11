@@ -38,7 +38,6 @@ class Model:
 
         resposta = resposta.replace("<|im_end|>", "").strip()
 
-
         return resposta
 
 

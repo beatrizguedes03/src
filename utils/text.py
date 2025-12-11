@@ -7,6 +7,8 @@ from nltk.corpus import stopwords
 class Text:
     def __init__(self, texto):
         self.texto = texto
+        self.textolimpo = self.limpartexto()
+        self.textosemstops = self.removerstopwords()
 
     def limpartexto(self):
         self.texto = self.texto.lower()
@@ -19,20 +21,20 @@ class Text:
 
         return self.texto
 
-    def removerstopwords(self, texto):
+    def removerstopwords(self):
         nltk.download('stopwords', quiet=True)
         stop = set(stopwords.words('portuguese'))
 
-        if isinstance(texto, str):
-            texto = texto.split()
+        if isinstance(self.textolimpo, str):
+            self.textolimpo = self.textolimpo.split()
 
-        return [palavra for palavra in texto if palavra not in stop]
+        return [palavra for palavra in self.textolimpo if palavra not in stop]
 
-    def vocabulariounico(self, texto):
-        return len(set(texto))
+    def vocabulariounico(self):
+        return len(set(self.textosemstops))
 
-    def maisfrequentes(self, texto):
-        contagem = Counter(texto)
+    def maisfrequentes(self):
+        contagem = Counter(self.textosemstops)
         top10 = contagem.most_common(10)
 
         palavras = [palavra for palavra, frequencia in top10]
