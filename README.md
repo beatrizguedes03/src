@@ -44,3 +44,6 @@ O CLI tem o objetivo de ler o PDF e extrair os seguintes dados do mesmo:
 Gostaria que a avaliação considerasse tanto a implementação do CLI quanto a arquitetura do código, clareza do fluxo, robustez dos tratamentos de exceção e uso da LLM dentro do pipeline. Também tenho interesse em receber feedback sobre boas práticas de organização, modularização e otimização para rodar modelos de linguagem.
 
 ## Observações
+- O projeto extrai elementos que não são imagens reais incorporadas no PDF (ex.: adesivos, shapes e elementos vetoriais do Canva).
+- O projeto não consegue extrair textos de imagens (OCR);
+- O projeto tem limite de até 20 MB ou 50 páginas.
