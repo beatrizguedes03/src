@@ -24,7 +24,7 @@ O CLI tem o objetivo de ler o PDF e extrair os seguintes dados do mesmo:
 - Requisitos:
 	- Python = 3.X;
 	- Dependências: vide requirements.txt;
-	- LLM utilizada: Qwen 2.5 - 0.5B
+	- LLM utilizada: Qwen2.5-0.5B-Instruct
 
 - Comandos:
 	- Gerar Estatísticas:
