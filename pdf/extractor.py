@@ -43,10 +43,10 @@ class Extractor:
         return paginas
 
     @staticmethod
-    def contarpalavras(texto: str):
-        if not texto.strip():
-            print(0)
-        return len(texto.split())
+    def contarpalavras(texto):
+        if isinstance(texto, list):
+            return len(texto)
+        return 0
 
     @staticmethod
     def organizar(npg, npa, vu, vd, p):

@@ -45,7 +45,7 @@ O CLI tem o objetivo de ler o PDF e extrair os seguintes dados do mesmo:
 	- Salvar em pasta específica:
 	```python main.py relatorio exemplo.pdf -o "caminho/para/exemplo.txt"```
 	(também funciona para endereço com contrabarras.)
-	
+
 ## O Que eu Gostaria Que Fosse Avaliado
 Gostaria que a avaliação considerasse tanto a implementação do CLI quanto a arquitetura do código, clareza do fluxo, robustez dos tratamentos de exceção e uso da LLM dentro do pipeline. Também tenho interesse em receber feedback sobre boas práticas de organização, modularização e otimização para rodar modelos de linguagem.
 
@@ -53,3 +53,4 @@ Gostaria que a avaliação considerasse tanto a implementação do CLI quanto a 
 - O projeto não extrai elementos que não são imagens reais incorporadas no PDF (ex.: adesivos, shapes e elementos vetoriais do Canva).
 - O projeto não consegue extrair textos de imagens (OCR);
 - O projeto tem limite de até 20 MB ou 50 páginas.
+- O projeto pode não extrair adequadamente palavras de um pdf produzido através da ferramenta Latex devido a caracteres especiais, acentuação e hifenização presentes no arquivo.

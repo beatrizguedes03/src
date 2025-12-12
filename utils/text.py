@@ -11,15 +11,26 @@ class Text:
         self.textosemstops = self.removerstopwords()
 
     def limpartexto(self):
-        self.texto = self.texto.lower()
-        self.texto = self.texto.replace(u'\xa0', ' ')
-        self.texto = unicodedata.normalize('NFKD', self.texto)
-        self.texto = self.texto.encode("ascii", "ignore").decode("utf-8")
-        self.texto = self.texto.replace("\n", " ").replace("\t", " ")
-        self.texto = re.sub(r"[^a-z0-9 ]+", " ", self.texto)
-        self.texto = re.sub(r"\s+", " ", self.texto).strip()
+        limpando = self.texto.lower()
 
-        return self.texto
+        limpando = limpando.replace(u'\xa0', ' ')
+
+        limpando = re.sub(r"\\[a-zA-Z]+{.*?}", "", limpando)
+        limpando = re.sub(r"\\[a-zA-Z]+\b", "", limpando)
+
+        limpando = unicodedata.normalize('NFKD', limpando)
+        limpando = limpando.encode("ascii", "ignore").decode("utf-8")
+
+        limpando = limpando.replace("-\n", "")
+        limpando = re.sub(r"[\n\t]+", " ", limpando)
+
+        limpando = re.sub(r"[^a-z0-9 ]+", " ", limpando)
+        limpando = re.sub(r"\s+", " ", limpando).strip()
+
+        textolimpo = re.findall(r"\b\w+\b", limpando)
+        textolimpo = [p for p in textolimpo if len(p) > 1]
+
+        return textolimpo
 
     def removerstopwords(self):
         nltk.download('stopwords', quiet=True)
