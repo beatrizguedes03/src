@@ -35,11 +35,17 @@ O CLI tem o objetivo de ler o PDF e extrair os seguintes dados do mesmo:
 	```python main.py resumo exemplo.pdf```
 	- Gerar Relatório
 	```python main.py relatorio exemplo.pdf```
-	- Gerar e Salvar Resumo:
+	- Gerar e Salvar Resumo (salvar em pasta padrão):
 	```python main.py resumo exemplo.pdf -o exemplo.txt``` ou ```python main.py resumo exemplo.pdf -o exemplo.md```
+	- Salvar em pasta específica:
+	```python main.py resumo exemplo.pdf -o "caminho/para/exemplo.txt"```
+	(também funciona para endereço com contrabarras.)
 	- Gerar e Salvar Relatório:
 	```python main.py relatorio exemplo.pdf -o exemplo.txt``` ou ```python main.py relatorio exemplo.pdf -o exemplo.md```
-
+	- Salvar em pasta específica:
+	```python main.py relatorio exemplo.pdf -o "caminho/para/exemplo.txt"```
+	(também funciona para endereço com contrabarras.)
+	
 ## O Que eu Gostaria Que Fosse Avaliado
 Gostaria que a avaliação considerasse tanto a implementação do CLI quanto a arquitetura do código, clareza do fluxo, robustez dos tratamentos de exceção e uso da LLM dentro do pipeline. Também tenho interesse em receber feedback sobre boas práticas de organização, modularização e otimização para rodar modelos de linguagem.
 

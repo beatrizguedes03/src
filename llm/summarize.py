@@ -51,29 +51,38 @@ class Summarize:
         return resumo
 
     def salvarresumo(self, resumo):
-        pasta = "resumos"
-        os.makedirs(pasta, exist_ok=True)
-        caminho = os.path.join(pasta, self.nome)  # junta pasta + nome do arquivo
+        caminho = self.nome
+        pasta = os.path.dirname(caminho)
+        if pasta:
+            os.makedirs(pasta, exist_ok=True)
+        else:
+            pasta = "resumos"
+            os.makedirs(pasta, exist_ok=True)
+            caminho = os.path.join(pasta, os.path.basename(caminho))
         try:
-            with open(caminho, "w", encoding="utf-8") as file:
-                file.write(resumo)
+            with open(caminho, "w", encoding="utf-8") as arquivo:
+                arquivo.write(resumo)
             logging.info(f"Resumo salvo com sucesso em {caminho}.")
-
         except Exception as e:
             logging.error(f"Falha ao salvar resumo: {e}")
 
     def salvarrelatorio(self, relatorio):
-        pasta = "relatorios"
-        os.makedirs(pasta, exist_ok=True)
-        caminho = os.path.join(pasta, self.nome)
+        caminho = self.nome
+        pasta = os.path.dirname(caminho)
+        if pasta:
+            os.makedirs(pasta, exist_ok=True)
+        else:
+            pasta = "relatorios"
+            os.makedirs(pasta, exist_ok=True)
+            caminho = os.path.join(pasta, os.path.basename(caminho))
         try:
-            with open(caminho, "w", encoding="utf-8") as f:
-                f.write("## Estatísticas\n")
-                f.write(str(relatorio['estatisticas']) + "\n\n")
-                f.write("## Resumo\n")
-                f.write(relatorio['resumo'] + "\n\n")
-                f.write("## Imagens\n")
-                f.write(str(relatorio['diretorioimagens']))
+            with open(caminho, "w", encoding="utf-8") as arquivo:
+                arquivo.write("## Estatísticas\n")
+                arquivo.write(str(relatorio['estatisticas']) + "\n\n")
+                arquivo.write("## Resumo\n")
+                arquivo.write(relatorio['resumo'] + "\n\n")
+                arquivo.write("## Imagens\n")
+                arquivo.write(str(relatorio['diretorioimagens']))
             logging.info(f"Relatório salvo em {caminho}")
         except Exception as e:
             logging.error(f"Falha ao salvar relatorio: {e}")
